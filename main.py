@@ -288,8 +288,8 @@ if __name__ == "__main__":
     #             f.write(f"{n:6d} {k:6d} {renomass2:.10e}\n")
     
     scan_and_plot(
-    coupling_range=(0.5, 9.0, 1.0),
-    b_range=(0.5, 1.6, 0.3),
+    coupling_range=(0.5, 2.0, 1.0),
+    b_range=(0.5, 1.0, 0.3),
     savefile="Output/scan.dat",
     plotfile="Output/scan.png"
 )
