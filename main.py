@@ -148,8 +148,8 @@ def renorm(Nmax, kt, b, coupling, loop_max=30, tol=1e-10):
 def scan_and_plot(
     coupling_range,
     b_range,
-    Nmax=3,
-    kt=2,
+    Nmax=4,
+    kt=5,
     savefile="scan.dat",
     plotfile=None
 ):
@@ -219,24 +219,60 @@ def scan_and_plot(
     # =========================================
     # 画图
     # =========================================
+    # plt.figure(figsize=(8, 6))
+
+    # for i, b in enumerate(bs):
+
+    #     plt.plot(
+    #         couplings,
+    #         result[i],
+    #         marker='o',
+    #         linewidth=2,
+    #         markersize=5,
+    #         label=fr"$b={b:.2f}$"
+    #     )
+
+    # plt.xlabel(r"Coupling_g", fontsize=14)
+    # plt.ylabel(r"Smallest deltam", fontsize=14)
+
+    # plt.title(
+    #     fr"$N_{{\max}}={Nmax},\ K_{{\max}}={kt}$",
+    #     fontsize=15
+    # )
+
+    # plt.grid(alpha=0.3)
+
+    # plt.legend(
+    #     fontsize=10,
+    #     frameon=False,
+    #     ncol=2
+    # )
+
+    # plt.tight_layout()
+
+    # if plotfile is not None:
+    #     plt.savefig(plotfile, dpi=300)
+
+    # plt.show()
+
     plt.figure(figsize=(8, 6))
 
-    for i, b in enumerate(bs):
+    for j, g in enumerate(couplings):
 
         plt.plot(
-            couplings,
-            result[i],
+            bs,
+            result[:, j],   # 注意这里转置
             marker='o',
             linewidth=2,
             markersize=5,
-            label=fr"$b={b:.2f}$"
+            label=fr"$g={g:.2f}$"
         )
 
-    plt.xlabel(r"Coupling_g", fontsize=14)
+    plt.xlabel(r"$b$", fontsize=14)
     plt.ylabel(r"Smallest deltam", fontsize=14)
 
     plt.title(
-        fr"$N_{{\max}}={Nmax},\ K_{{\max}}={kt}$",
+        fr"$n={Nmax},\ k={kt}$",
         fontsize=15
     )
 
@@ -264,35 +300,33 @@ def scan_and_plot(
 if __name__ == "__main__":
 
     
-    # Nmax = 6  
-    # Kmax = 6
-    # b = 1.2
-    # coupling = 1.5
+    Nmax = 6  
+    Kmax = 6
+    b = 2.0
+    coupling = 2.5
+    output_file = "/home/linzy/glueball/MainProgram/renom.dat"
 
+    with open(output_file, "w") as f:
 
-    # output_file = "/home/linzy/glueball/MainProgram/renom.dat"
+        for k in range(2, Kmax + 1):
+            for n in range(3, Nmax + 1):
 
-    # with open(output_file, "w") as f:
+                renomass2 = renorm(
+                    Nmax=n,
+                    kt=k,
+                    b=b,
+                    coupling=coupling
+                )
 
-    #     for k in range(2, Kmax + 1):
-    #         for n in range(3, Nmax + 1):
-
-    #             renomass2 = renorm(
-    #                 Nmax=n,
-    #                 kt=k,
-    #                 b=b,
-    #                 coupling=coupling
-    #             )
-
-    #             # 只写三列：n k value
-    #             f.write(f"{n:6d} {k:6d} {renomass2:.10e}\n")
+                # 只写三列：n k value
+                f.write(f"{n:6d} {k:6d} {renomass2:.10e}\n")
     
-    scan_and_plot(
-    coupling_range=(0.5, 2.0, 1.0),
-    b_range=(0.5, 1.0, 0.3),
-    savefile="Output/scan.dat",
-    plotfile="Output/scan.png"
-)
+#     scan_and_plot(
+#     coupling_range=(0.5, 20.0, 2.0),
+#     b_range=(0.1, 3.0, 0.4),
+#     savefile="Output/scan.dat",
+#     plotfile="Output/scan.png"
+# )
 
     
 
