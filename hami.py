@@ -344,9 +344,13 @@ def H_g_gg(bra, ket, params):
 
     mj = 2
     
-    bee = b * np.sqrt((float(kt) + (mj % 2) / 2.0) / Pplus)
+    # bee = b * np.sqrt((float(kt) + (mj % 2) / 2.0) / Pplus)
 
-    Pplus = kp1 
+    bee = b 
+
+    # print("bee = ", bee)
+
+    Pplus = 6.0
 
     
     coupling_eff = couplings * CF / sqrt(2.0)
