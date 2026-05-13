@@ -71,78 +71,30 @@ def build_hamiltonian(Nmax, K, params: PhysicsParams):
 
 
 
-def renorm(Nmax, kt, b, coupling, p_plus, loop_max=30, tol=1e-10):
+def renorm(Nmax, kt, b, coupling, p_plus, loop_max=30, tol=1e-10, max_retry=5):
+    """
+    若单次对角化/迭代出现 nan，最多重试 max_retry 次（与 scan 原先逻辑一致）。
+    """
 
-
-    # -------------------------
-    # 初始构造
-    # -------------------------
-    params = PhysicsParams(
-        couplings=coupling,
-        b=b,
-        mass_g=0.0,
-        mass_gg=0.0,
-        p_plus=p_plus,
-    )
-
-    H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
-
-    # dump_hamiltonian_dense(H, "Output/h.dat")
-
-    vals, vecs = eigsh(H, k=3, which='SA')
-    eigenv1 = vals[0] * kt
-
-    # print("vals[0] = ", vals[0] , "kt = ", kt)
-
-    renomass2 = np.sqrt(-eigenv1)
-    inputmass = renomass2
-
-
-    # params = PhysicsParams(
-    #     couplings=coupling,
-    #     b=b,
-    #     mass_g=inputmass,
-    #     mass_gg=inputmass
-    # )
-
-    params = PhysicsParams(
-        couplings=coupling,
-        b=b,
-        mass_g=inputmass,
-        mass_gg=0.0,
-        p_plus=p_plus,
-    )
-
-    H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
-    vals, vecs = eigsh(H, k=3, which='SA')
-
-    eigenv2 = vals[0] * kt
-    # print("eigenv1 = ", eigenv1)
-    # print("eigenv2 = ", eigenv2)
-
-    renomass1 = 0.0
-
-    for _ in range(loop_max):
-
-        if abs(eigenv2) < tol:
-            break
-
-
-        renomass3 = np.sqrt(
-            renomass1**2 +
-            (renomass2**2 - renomass1**2) / (eigenv2 - eigenv1) * (-eigenv1)
+    def _once():
+        # -------------------------
+        # 初始构造
+        # -------------------------
+        params = PhysicsParams(
+            couplings=coupling,
+            b=b,
+            mass_g=0.0,
+            mass_gg=0.0,
+            p_plus=p_plus,
         )
 
-        # print("renomass3 = ", renomass3)
+        H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
 
-        inputmass = renomass3
+        vals, vecs = eigsh(H, k=3, which='SA')
+        eigenv1 = vals[0] * kt
 
-        # params = PhysicsParams(
-        #     couplings=coupling,
-        #     b=b,
-        #     mass_g=inputmass,
-        #     mass_gg=inputmass
-        # )
+        renomass2 = np.sqrt(-eigenv1)
+        inputmass = renomass2
 
         params = PhysicsParams(
             couplings=coupling,
@@ -155,14 +107,47 @@ def renorm(Nmax, kt, b, coupling, p_plus, loop_max=30, tol=1e-10):
         H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
         vals, vecs = eigsh(H, k=3, which='SA')
 
-        # shift update
-        eigenv1 = eigenv2
         eigenv2 = vals[0] * kt
 
-        renomass1 = renomass2
-        renomass2 = renomass3
+        renomass1 = 0.0
 
-    return renomass2
+        for _ in range(loop_max):
+
+            if abs(eigenv2) < tol:
+                break
+
+            renomass3 = np.sqrt(
+                renomass1**2 +
+                (renomass2**2 - renomass1**2) / (eigenv2 - eigenv1) * (-eigenv1)
+            )
+
+            inputmass = renomass3
+
+            params = PhysicsParams(
+                couplings=coupling,
+                b=b,
+                mass_g=inputmass,
+                mass_gg=0.0,
+                p_plus=p_plus,
+            )
+
+            H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
+            vals, vecs = eigsh(H, k=3, which='SA')
+
+            eigenv1 = eigenv2
+            eigenv2 = vals[0] * kt
+
+            renomass1 = renomass2
+            renomass2 = renomass3
+
+        return renomass2
+
+    value = np.nan
+    for _ in range(max_retry):
+        value = _once()
+        if not isnan(value):
+            break
+    return value
 
 def scan_and_plot(
     coupling_range,
@@ -204,27 +189,17 @@ def scan_and_plot(
     # 扫描
     # =========================================
     with open(savefile, "w") as f:
-        
-        max_retry = 5
+
         for i, b in enumerate(bs):
             for j, coupling in enumerate(couplings):
-                
-                value = np.nan
 
-                # 最多重复 max_retry 次
-                for attempt in range(max_retry):
-
-                    value = renorm(
-                        Nmax=Nmax,
-                        kt=kt,
-                        b=b,
-                        coupling=coupling,
-                        p_plus=p_plus,
-                    )
-
-                    # 如果不是 nan 就退出
-                    if not isnan(value):
-                        break
+                value = renorm(
+                    Nmax=Nmax,
+                    kt=kt,
+                    b=b,
+                    coupling=coupling,
+                    p_plus=p_plus,
+                )
 
                 result[i, j] = value
 
