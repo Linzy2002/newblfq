@@ -100,7 +100,7 @@ def renorm(Nmax, kt, b, coupling, p_plus, loop_max=30, tol=1e-10, max_retry=5):
             couplings=coupling,
             b=b,
             mass_g=inputmass,
-            mass_gg=0.0,
+            mass_gg=inputmass,
             p_plus=p_plus,
         )
 
@@ -127,7 +127,7 @@ def renorm(Nmax, kt, b, coupling, p_plus, loop_max=30, tol=1e-10, max_retry=5):
                 couplings=coupling,
                 b=b,
                 mass_g=inputmass,
-                mass_gg=0.0,
+                mass_gg=inputmass,
                 p_plus=p_plus,
             )
 
