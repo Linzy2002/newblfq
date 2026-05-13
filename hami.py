@@ -75,7 +75,7 @@ def H_g_g(bra, ket, params):
     b = params.b
     lag = 30.1
 
-    Pplus = 6.0
+    Pplus = params.p_plus
 
     kt = kp1
     mj = 2
@@ -180,8 +180,8 @@ def H_gg_gg(bra, ket, params):
 
 ##!!!!!!!!!!!!!!!!!!!!!!!总动量， 可能要调整
 
-    Pplus = 6.0
-    
+    Pplus = params.p_plus
+
     bee = b * np.sqrt((float(kt) + (mj % 2) / 2.0) / Pplus)
     
     Pplus = kt
@@ -336,26 +336,10 @@ def H_g_gg(bra, ket, params):
     # -------------------------
     couplings = params.couplings
     b = params.b
-
-
-    Pplus = 6.0
-
-    kt = kp1
-
+    Pplus = params.p_plus
     mj = 2
-    
-    # bee = b * np.sqrt((float(kt) + (mj % 2) / 2.0) / Pplus)
-
-    bee = b 
-
-    # print("bee = ", bee)
-
-    Pplus = 6.0
-
-    
+    bee = b  
     coupling_eff = couplings * CF / sqrt(2.0)
-
-    # coupling_eff = couplings * CF 
 
     # -------------------------
     # selection rule

@@ -18,6 +18,8 @@ class PhysicsParams:
     b: float
     mass_g: float
     mass_gg: float
+    # 与纵向截断 Kmax 对齐的总动量 P+（hami 中 bee 等用）；与 __main__ 里 Kmax 同一数值即可
+    p_plus: float
 
 
 
@@ -69,7 +71,7 @@ def build_hamiltonian(Nmax, K, params: PhysicsParams):
 
 
 
-def renorm(Nmax, kt, b, coupling, loop_max=30, tol=1e-10):
+def renorm(Nmax, kt, b, coupling, p_plus, loop_max=30, tol=1e-10):
 
 
     # -------------------------
@@ -79,7 +81,8 @@ def renorm(Nmax, kt, b, coupling, loop_max=30, tol=1e-10):
         couplings=coupling,
         b=b,
         mass_g=0.0,
-        mass_gg=0.0
+        mass_gg=0.0,
+        p_plus=p_plus,
     )
 
     H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
@@ -106,7 +109,8 @@ def renorm(Nmax, kt, b, coupling, loop_max=30, tol=1e-10):
         couplings=coupling,
         b=b,
         mass_g=inputmass,
-        mass_gg=0.0
+        mass_gg=0.0,
+        p_plus=p_plus,
     )
 
     H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
@@ -144,7 +148,8 @@ def renorm(Nmax, kt, b, coupling, loop_max=30, tol=1e-10):
             couplings=coupling,
             b=b,
             mass_g=inputmass,
-            mass_gg=0.0
+            mass_gg=0.0,
+            p_plus=p_plus,
         )
 
         H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
@@ -165,7 +170,8 @@ def scan_and_plot(
     Nmax=4,
     kt=5,
     savefile="scan.dat",
-    plotfile=None
+    plotfile=None,
+    p_plus=None,
 ):
     """
     扫描 renorm 并画：
@@ -191,6 +197,9 @@ def scan_and_plot(
 
     result = np.zeros((len(bs), len(couplings)))
 
+    if p_plus is None:
+        p_plus = float(kt)
+
     # =========================================
     # 扫描
     # =========================================
@@ -209,7 +218,8 @@ def scan_and_plot(
                         Nmax=Nmax,
                         kt=kt,
                         b=b,
-                        coupling=coupling
+                        coupling=coupling,
+                        p_plus=p_plus,
                     )
 
                     # 如果不是 nan 就退出
@@ -314,8 +324,9 @@ def scan_and_plot(
 if __name__ == "__main__":
 
     
-    Nmax = 6  
-    Kmax = 6
+    Nmax = 6
+    Kmax = 7
+    p_plus = float(Kmax)
     b = 1.0
     coupling = 1.0
     # output_file = "/home/linzy/glueball/MainProgram/renom.dat"
@@ -330,7 +341,8 @@ if __name__ == "__main__":
                     Nmax=n,
                     kt=k,
                     b=b,
-                    coupling=coupling
+                    coupling=coupling,
+                    p_plus=p_plus,
                 )
 
                 # 只写三列：n k value
