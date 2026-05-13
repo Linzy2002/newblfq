@@ -349,9 +349,9 @@ def H_g_gg(bra, ket, params):
     Pplus = kp1 
 
     
-    # coupling_eff = couplings * CF / sqrt(2.0)
+    coupling_eff = couplings * CF / sqrt(2.0)
 
-    coupling_eff = couplings * CF 
+    # coupling_eff = couplings * CF 
 
     # -------------------------
     # selection rule

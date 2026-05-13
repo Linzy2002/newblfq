@@ -95,11 +95,18 @@ def renorm(Nmax, kt, b, coupling, loop_max=30, tol=1e-10):
     inputmass = renomass2
 
 
+    # params = PhysicsParams(
+    #     couplings=coupling,
+    #     b=b,
+    #     mass_g=inputmass,
+    #     mass_gg=inputmass
+    # )
+
     params = PhysicsParams(
         couplings=coupling,
         b=b,
         mass_g=inputmass,
-        mass_gg=inputmass
+        mass_gg=0.0
     )
 
     H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
@@ -126,11 +133,18 @@ def renorm(Nmax, kt, b, coupling, loop_max=30, tol=1e-10):
 
         inputmass = renomass3
 
+        # params = PhysicsParams(
+        #     couplings=coupling,
+        #     b=b,
+        #     mass_g=inputmass,
+        #     mass_gg=inputmass
+        # )
+
         params = PhysicsParams(
             couplings=coupling,
             b=b,
             mass_g=inputmass,
-            mass_gg=inputmass
+            mass_gg=0.0
         )
 
         H = build_hamiltonian(Nmax=Nmax, K=kt, params=params)
@@ -302,9 +316,10 @@ if __name__ == "__main__":
     
     Nmax = 6  
     Kmax = 6
-    b = 2.0
-    coupling = 2.5
-    output_file = "/home/linzy/glueball/MainProgram/renom.dat"
+    b = 1.0
+    coupling = 1.0
+    # output_file = "/home/linzy/glueball/MainProgram/renom.dat"
+    output_file = "Output/renom.dat"
 
     with open(output_file, "w") as f:
 
